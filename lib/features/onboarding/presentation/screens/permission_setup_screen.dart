@@ -197,7 +197,11 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                               final stateMachine = ref.read(monitoringStateMachineProvider);
                               await stateMachine.startMonitoring();
                               if (context.mounted) {
-                                context.go('/dashboard');
+                                if (context.canPop()) {
+                                  context.pop();
+                                } else {
+                                  context.go('/');
+                                }
                               }
                             }
                           : null,

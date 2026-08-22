@@ -109,51 +109,7 @@ class SettingsScreen extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // Section 3: Diagnostic & Debugging
-          const Text(
-            'التشخيص والمطورين',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF38BDF8),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          Mas7oolCard(
-            onTap: () => context.push('/diagnostics'),
-            child: const Row(
-              children: [
-                Icon(Icons.bug_report_outlined, color: Color(0xFFF59E0B)),
-                SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'شاشة التشخيص اللحظي (Diagnostics)',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'فحص التطبيق النشط في Foreground وحالة الـ State Machine',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF64748B)),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Section 4: Privacy & Data
+          // Section 3: Privacy & Data
           const Text(
             'الخصوصية والبيانات المحلية',
             style: TextStyle(

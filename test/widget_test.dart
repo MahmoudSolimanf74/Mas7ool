@@ -10,7 +10,7 @@ void main() {
       ),
     );
 
-    // Verify app renders with Arabic Title
-    expect(find.text('مسؤول (Mas7ool)'), findsOneWidget);
+    // Verify app renders with Title
+    expect(find.text('Mas7ool'), findsOneWidget);
   });
 }

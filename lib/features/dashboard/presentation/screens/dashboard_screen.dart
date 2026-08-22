@@ -33,24 +33,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return RtlScaffold(
       appBar: AppBar(
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.shield_outlined, color: Color(0xFF38BDF8), size: 24),
-            SizedBox(width: 8),
-            Text(
-              'مسؤول (Mas7ool)',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
+        title: const Text(
+          'Mas7ool',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.build_circle_outlined, color: Color(0xFF94A3B8)),
-            tooltip: 'فحص وتشخيص',
-            onPressed: () => context.push('/diagnostics'),
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -75,25 +61,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const SizedBox(height: 20),
 
             // Monitored Apps Header & Preview
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'التطبيقات الخاضعة للتحكم',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () {
-                    ref.read(selectedTabIndexProvider.notifier).state = 1;
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                  label: const Text('عرض الكل'),
-                ),
-              ],
+            const Text(
+              'التطبيقات الخاضعة للتحكم',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 8),
 

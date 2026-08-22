@@ -14,16 +14,11 @@ class MonitoredAppsScreen extends ConsumerWidget {
     final appsAsync = ref.watch(monitoredAppsStreamProvider);
     final repo = ref.watch(monitoredAppsRepositoryProvider);
 
+    final hasApps = appsAsync.valueOrNull?.isNotEmpty ?? false;
+
     return RtlScaffold(
       appBar: AppBar(
         title: const Text('التطبيقات المُراقَبة'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: Color(0xFF38BDF8)),
-            tooltip: 'إضافة تطبيقات',
-            onPressed: () => context.push('/monitored-apps/add'),
-          ),
-        ],
       ),
       body: appsAsync.when(
         data: (apps) {
@@ -103,13 +98,16 @@ class MonitoredAppsScreen extends ConsumerWidget {
           child: Text('حدث خطأ: $err', style: const TextStyle(color: Colors.red)),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/monitored-apps/add'),
-        backgroundColor: const Color(0xFF2563EB),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('إضافة تطبيق'),
-      ),
+      floatingActionButton: hasApps
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/monitored-apps/add'),
+              backgroundColor: const Color(0xFF2563EB),
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('إضافة تطبيقات'),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
