@@ -1,0 +1,54 @@
+name: mas7ool
+description: "Mas7ool (مسؤول) - Android Screen Time & Social Media Usage Limiter"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Local Persistence
+  drift: ^2.24.2
+  sqlite3_flutter_libs: ^0.5.28
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  shared_preferences: ^2.3.5
+
+  # Routing
+  go_router: ^14.8.0
+
+  # Device & App Info
+  device_info_plus: ^11.3.0
+  package_info_plus: ^8.2.1
+  installed_apps: ^2.1.1
+
+  # Notifications
+  flutter_local_notifications: ^18.0.1
+
+  # Utilities
+  logger: ^2.5.0
+  intl: ^0.20.2
+  uuid: ^4.5.1
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.3
+  drift_dev: ^2.24.2
+
+flutter:
+  uses-material-design: true
+
