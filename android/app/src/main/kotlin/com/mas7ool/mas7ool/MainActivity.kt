@@ -189,8 +189,8 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
             }
 
             "getCurrentForegroundPackage" -> {
-                val event = detector.detectForegroundApp()
-                result.success(event?.packageName)
+                val pkg = detector.getRawForegroundPackage()
+                result.success(pkg)
             }
 
             else -> result.notImplemented()

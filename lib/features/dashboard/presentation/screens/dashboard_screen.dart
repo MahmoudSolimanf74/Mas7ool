@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../../../shared/widgets/rtl_scaffold.dart';
 import '../../../../shared/widgets/mas7ool_card.dart';
+import '../../../main/presentation/screens/main_navigation_screen.dart';
 import '../widgets/monitoring_status_header.dart';
 import '../widgets/active_session_card.dart';
 import '../widgets/quick_stats_section.dart';
@@ -17,8 +18,6 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  int _currentBottomNavIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -50,11 +49,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: const Icon(Icons.build_circle_outlined, color: Color(0xFF94A3B8)),
             tooltip: 'فحص وتشخيص',
             onPressed: () => context.push('/diagnostics'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Color(0xFF94A3B8)),
-            tooltip: 'الإعدادات',
-            onPressed: () => context.push('/settings'),
           ),
         ],
       ),
@@ -93,7 +87,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () => context.push('/monitored-apps'),
+                  onPressed: () {
+                    ref.read(selectedTabIndexProvider.notifier).state = 1;
+                  },
                   icon: const Icon(Icons.arrow_back_rounded, size: 16),
                   label: const Text('عرض الكل'),
                 ),
@@ -211,47 +207,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const SizedBox(height: 24),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentBottomNavIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF131B2E),
-        selectedItemColor: const Color(0xFF38BDF8),
-        unselectedItemColor: const Color(0xFF64748B),
-        onTap: (index) {
-          setState(() => _currentBottomNavIndex = index);
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-              context.push('/monitored-apps');
-              break;
-            case 2:
-              context.push('/history');
-              break;
-            case 3:
-              context.push('/settings');
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: 'الرئيسية',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.apps_rounded),
-            label: 'التطبيقات',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history_rounded),
-            label: 'السجل',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_rounded),
-            label: 'الإعدادات',
-          ),
-        ],
       ),
     );
   }

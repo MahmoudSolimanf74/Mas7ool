@@ -3,19 +3,20 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
-import 'features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'features/diagnostics/presentation/screens/diagnostics_screen.dart';
+import 'features/main/presentation/screens/main_navigation_screen.dart';
 import 'features/monitored_apps/presentation/screens/add_apps_screen.dart';
-import 'features/monitored_apps/presentation/screens/monitored_apps_screen.dart';
 import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'features/onboarding/presentation/screens/permission_setup_screen.dart';
-import 'features/sessions/presentation/screens/session_history_screen.dart';
 import 'features/settings/presentation/screens/device_compatibility_screen.dart';
-import 'features/settings/presentation/screens/settings_screen.dart';
 
 final _router = GoRouter(
-  initialLocation: '/dashboard',
+  initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const MainNavigationScreen(),
+    ),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
@@ -25,32 +26,12 @@ final _router = GoRouter(
       builder: (context, state) => const PermissionSetupScreen(),
     ),
     GoRoute(
-      path: '/dashboard',
-      builder: (context, state) => const DashboardScreen(),
+      path: '/monitored-apps/add',
+      builder: (context, state) => const AddAppsScreen(),
     ),
     GoRoute(
-      path: '/monitored-apps',
-      builder: (context, state) => const MonitoredAppsScreen(),
-      routes: [
-        GoRoute(
-          path: 'add',
-          builder: (context, state) => const AddAppsScreen(),
-        ),
-      ],
-    ),
-    GoRoute(
-      path: '/history',
-      builder: (context, state) => const SessionHistoryScreen(),
-    ),
-    GoRoute(
-      path: '/settings',
-      builder: (context, state) => const SettingsScreen(),
-      routes: [
-        GoRoute(
-          path: 'compatibility',
-          builder: (context, state) => const DeviceCompatibilityScreen(),
-        ),
-      ],
+      path: '/settings/compatibility',
+      builder: (context, state) => const DeviceCompatibilityScreen(),
     ),
     GoRoute(
       path: '/diagnostics',

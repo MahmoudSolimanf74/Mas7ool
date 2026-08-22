@@ -172,25 +172,46 @@ class SessionEngine {
 
   Future<void> _handleExpiration() async {
     if (_activeSession == null) return;
-    AppLogger.w('SESSION', 'Session expired for ${_activeSession!.packageName}');
+    final currentSession = _activeSession!;
+    _tickerTimer?.cancel();
 
-    _activeSession = _activeSession!.copyWith(status: SessionStatus.expired);
-    await _sessionRepository.saveSession(_activeSession!);
-    await _nativeBridge.removeActiveSession(_activeSession!.packageName);
+    AppLogger.w('SESSION', 'Session timer reached zero for ${currentSession.packageName}');
 
-    // Trigger local notification
-    await NotificationService.showSessionExpiredNotification(
-      appName: _activeSession!.appName,
-    );
+    // 1. Check current foreground package
+    final currentForeground = await _nativeBridge.getCurrentForegroundPackage();
+    AppLogger.d('SESSION', 'Expiration check: target=${currentSession.packageName}, currentForeground=$currentForeground');
 
-    // Trigger Native / Flutter overlay
-    await _nativeBridge.showSessionExpiredOverlay(
-      packageName: _activeSession!.packageName,
-      appName: _activeSession!.appName,
-    );
+    // Remove active session from native prefs so monitoring knows it's no longer running
+    await _nativeBridge.removeActiveSession(currentSession.packageName);
 
-    onSessionExpired?.call(_activeSession!);
-    _sessionStreamController.add(_activeSession);
+    if (currentForeground == currentSession.packageName) {
+      // User is STILL currently in the monitored app -> Show expired overlay & notification
+      AppLogger.i('SESSION', 'User is still inside ${currentSession.packageName} -> Showing Expired Overlay');
+      _activeSession = currentSession.copyWith(status: SessionStatus.expired);
+      await _sessionRepository.saveSession(_activeSession!);
+
+      // Trigger local notification
+      await NotificationService.showSessionExpiredNotification(
+        appName: currentSession.appName,
+      );
+
+      await _nativeBridge.showSessionExpiredOverlay(
+        packageName: currentSession.packageName,
+        appName: currentSession.appName,
+      );
+
+      onSessionExpired?.call(_activeSession!);
+      _sessionStreamController.add(_activeSession);
+    } else {
+      // User has ALREADY left the app (on home screen or other app) -> Silently end session without popup and without notification!
+      AppLogger.i('SESSION', 'User already left ${currentSession.packageName} (now on $currentForeground). Silently ending session without popup/notification.');
+      final endedSession = currentSession.copyWith(status: SessionStatus.ended);
+      await _sessionRepository.saveSession(endedSession);
+
+      _activeSession = null;
+      onSessionExpired?.call(endedSession);
+      _sessionStreamController.add(null);
+    }
   }
 
   void dispose() {

@@ -101,6 +101,8 @@ class ForegroundAppDetector(private val context: Context) {
         val targetPackage = latestPackageName ?: return null
         val eventTimestamp = latestTimestamp
 
+        currentForegroundPackage = targetPackage
+
         // Ignore self app
         if (targetPackage == context.packageName) {
             return null
@@ -146,6 +148,52 @@ class ForegroundAppDetector(private val context: Context) {
         } catch (e: Exception) {
             packageName
         }
+    }
+
+    companion object {
+        @Volatile
+        var currentForegroundPackage: String? = null
+    }
+
+    fun getRawForegroundPackage(): String? {
+        if (!PermissionHelper.hasUsageStatsPermission(context) || usageStatsManager == null) {
+            return currentForegroundPackage
+        }
+
+        val currentTime = System.currentTimeMillis()
+        // Query events from the last 2 hours to guarantee finding the most recent foreground app
+        val startTime = currentTime - (2 * 60 * 60 * 1000L)
+
+        val events: UsageEvents = try {
+            usageStatsManager.queryEvents(startTime, currentTime)
+        } catch (e: Exception) {
+            return currentForegroundPackage
+        }
+
+        var latestPackageName: String? = null
+        var latestTimestamp: Long = 0L
+        val event = UsageEvents.Event()
+
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            val isForeground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                event.eventType == UsageEvents.Event.ACTIVITY_RESUMED
+            } else {
+                @Suppress("DEPRECATION")
+                event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND || event.eventType == UsageEvents.Event.ACTIVITY_RESUMED
+            }
+
+            if (isForeground && event.timeStamp >= latestTimestamp) {
+                latestPackageName = event.packageName
+                latestTimestamp = event.timeStamp
+            }
+        }
+
+        if (latestPackageName != null) {
+            currentForegroundPackage = latestPackageName
+        }
+
+        return latestPackageName ?: currentForegroundPackage
     }
 
     fun resetState() {
