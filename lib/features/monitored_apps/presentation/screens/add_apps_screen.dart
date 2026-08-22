@@ -17,7 +17,6 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
   List<MonitoredApp> _installedApps = [];
   bool _isLoading = true;
   String _searchQuery = '';
-  bool _includeSystemApps = false;
 
   @override
   void initState() {
@@ -28,7 +27,7 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
   Future<void> _loadInstalledApps() async {
     setState(() => _isLoading = true);
     final repo = ref.read(monitoredAppsRepositoryProvider);
-    final apps = await repo.scanInstalledApps(includeSystem: _includeSystemApps);
+    final apps = await repo.scanInstalledApps(includeSystem: true);
     if (mounted) {
       setState(() {
         _installedApps = apps;
@@ -61,10 +60,11 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
       ),
       body: Column(
         children: [
-          // Search & Filter Box
+          // Search Box
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   onChanged: (val) => setState(() => _searchQuery = val),
@@ -80,29 +80,9 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'تم العثور على ${filteredApps.length} تطبيق',
-                      style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-                    ),
-                    Row(
-                      children: [
-                        const Text(
-                          'تطبيقات النظام',
-                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
-                        ),
-                        Switch(
-                          value: _includeSystemApps,
-                          onChanged: (val) {
-                            setState(() => _includeSystemApps = val);
-                            _loadInstalledApps();
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                Text(
+                  'تم العثور على ${filteredApps.length} تطبيق',
+                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
                 ),
               ],
             ),

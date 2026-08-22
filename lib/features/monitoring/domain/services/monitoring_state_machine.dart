@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:mas7ool/core/permissions/app_permissions.dart';
 import 'package:mas7ool/core/services/native_bridge_service.dart';
 import 'package:mas7ool/core/utils/app_logger.dart';
+import 'package:mas7ool/database/app_database.dart';
 import 'package:mas7ool/features/monitored_apps/domain/entities/monitored_app.dart';
 import 'package:mas7ool/features/monitored_apps/domain/repositories/monitored_apps_repository.dart';
 import 'package:mas7ool/features/overlay/domain/services/overlay_controller.dart';
@@ -44,6 +45,7 @@ class MonitoringStateMachine {
 
   String? _lastPromptedPackage;
   DateTime _lastPromptTime = DateTime.fromMillisecondsSinceEpoch(0);
+  final AppDatabase? _db;
 
   MonitoringStateMachine({
     required PermissionManager permissionManager,
@@ -52,12 +54,14 @@ class MonitoringStateMachine {
     required SessionEngine sessionEngine,
     required OverlayController overlayController,
     required NativeBridgeService nativeBridge,
+    AppDatabase? db,
   })  : _permissionManager = permissionManager,
         _monitoredAppsRepo = monitoredAppsRepo,
         _foregroundMonitor = foregroundMonitor,
         _sessionEngine = sessionEngine,
         _overlayController = overlayController,
-        _nativeBridge = nativeBridge {
+        _nativeBridge = nativeBridge,
+        _db = db {
     _initListeners();
   }
 
@@ -108,6 +112,11 @@ class MonitoringStateMachine {
 
     _transitionTo(MonitoringState.ready, 'Permissions validated');
 
+    // Save enabled state to persistent database
+    if (_db != null) {
+      await _db!.setSetting('monitoring_enabled', 'true');
+    }
+
     // Start native Foreground Service
     await _nativeBridge.startMonitoringService();
     await _monitoredAppsRepo.syncNativeList();
@@ -130,6 +139,12 @@ class MonitoringStateMachine {
     AppLogger.i('STATE_MACHINE', 'Stopping monitoring...');
     _foregroundSub?.cancel();
     _foregroundSub = null;
+
+    // Save disabled state to persistent database
+    if (_db != null) {
+      await _db!.setSetting('monitoring_enabled', 'false');
+    }
+
     await _nativeBridge.stopMonitoringService();
     await _overlayController.close();
     _transitionTo(MonitoringState.stopped, 'User stopped monitoring');

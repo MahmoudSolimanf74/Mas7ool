@@ -82,6 +82,7 @@ final monitoringStateMachineProvider = Provider<MonitoringStateMachine>((ref) {
   final sessionEngine = ref.watch(sessionEngineProvider);
   final overlayController = ref.watch(overlayControllerProvider);
   final bridge = ref.watch(nativeBridgeProvider);
+  final db = ref.watch(databaseProvider);
 
   final sm = MonitoringStateMachine(
     permissionManager: permManager,
@@ -90,6 +91,7 @@ final monitoringStateMachineProvider = Provider<MonitoringStateMachine>((ref) {
     sessionEngine: sessionEngine,
     overlayController: overlayController,
     nativeBridge: bridge,
+    db: db,
   );
   ref.onDispose(() => sm.dispose());
   return sm;

@@ -10,6 +10,7 @@ part 'app_database.g.dart';
 class MonitoredAppsTable extends Table {
   TextColumn get packageName => text()();
   TextColumn get appName => text()();
+  BlobColumn get iconBytes => blob().nullable()();
   BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
   DateTimeColumn get addedAt => dateTime()();
   IntColumn get defaultDurationMinutes => integer().withDefault(const Constant(5))();
@@ -47,7 +48,16 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(monitoredAppsTable, monitoredAppsTable.iconBytes);
+          }
+        },
+      );
 
   // Monitored Apps queries
   Future<List<MonitoredAppData>> getAllMonitoredApps() =>

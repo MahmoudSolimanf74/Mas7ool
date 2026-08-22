@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/permissions/app_permissions.dart';
 import '../../../../core/providers/app_providers.dart';
 import '../../../../shared/widgets/rtl_scaffold.dart';
 import '../../../../shared/widgets/mas7ool_card.dart';
-import '../../../main/presentation/screens/main_navigation_screen.dart';
 import '../widgets/monitoring_status_header.dart';
 import '../widgets/active_session_card.dart';
 import '../widgets/quick_stats_section.dart';
@@ -21,9 +21,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-check permissions on launch
-    Future.microtask(() {
-      ref.read(permissionManagerProvider).checkAll();
+    // Auto-check permissions & restore monitoring state on launch
+    Future.microtask(() async {
+      final permMap = await ref.read(permissionManagerProvider).checkAll();
+      final usageOk = permMap[AppPermissionType.usageAccess]?.isGranted ?? false;
+      final overlayOk = permMap[AppPermissionType.overlay]?.isGranted ?? false;
+
+      final db = ref.read(databaseProvider);
+      final savedState = await db.getSetting('monitoring_enabled');
+
+      if (usageOk && overlayOk && (savedState == 'true' || savedState == null)) {
+        await ref.read(monitoringStateMachineProvider).startMonitoring();
+      }
     });
   }
 

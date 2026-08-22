@@ -31,6 +31,17 @@ class $MonitoredAppsTableTable extends MonitoredAppsTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _iconBytesMeta = const VerificationMeta(
+    'iconBytes',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> iconBytes = GeneratedColumn<Uint8List>(
+    'icon_bytes',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isEnabledMeta = const VerificationMeta(
     'isEnabled',
   );
@@ -72,6 +83,7 @@ class $MonitoredAppsTableTable extends MonitoredAppsTable
   List<GeneratedColumn> get $columns => [
     packageName,
     appName,
+    iconBytes,
     isEnabled,
     addedAt,
     defaultDurationMinutes,
@@ -106,6 +118,12 @@ class $MonitoredAppsTableTable extends MonitoredAppsTable
       );
     } else if (isInserting) {
       context.missing(_appNameMeta);
+    }
+    if (data.containsKey('icon_bytes')) {
+      context.handle(
+        _iconBytesMeta,
+        iconBytes.isAcceptableOrUnknown(data['icon_bytes']!, _iconBytesMeta),
+      );
     }
     if (data.containsKey('is_enabled')) {
       context.handle(
@@ -147,6 +165,10 @@ class $MonitoredAppsTableTable extends MonitoredAppsTable
         DriftSqlType.string,
         data['${effectivePrefix}app_name'],
       )!,
+      iconBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}icon_bytes'],
+      ),
       isEnabled: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_enabled'],
@@ -172,12 +194,14 @@ class MonitoredAppData extends DataClass
     implements Insertable<MonitoredAppData> {
   final String packageName;
   final String appName;
+  final Uint8List? iconBytes;
   final bool isEnabled;
   final DateTime addedAt;
   final int defaultDurationMinutes;
   const MonitoredAppData({
     required this.packageName,
     required this.appName,
+    this.iconBytes,
     required this.isEnabled,
     required this.addedAt,
     required this.defaultDurationMinutes,
@@ -187,6 +211,9 @@ class MonitoredAppData extends DataClass
     final map = <String, Expression>{};
     map['package_name'] = Variable<String>(packageName);
     map['app_name'] = Variable<String>(appName);
+    if (!nullToAbsent || iconBytes != null) {
+      map['icon_bytes'] = Variable<Uint8List>(iconBytes);
+    }
     map['is_enabled'] = Variable<bool>(isEnabled);
     map['added_at'] = Variable<DateTime>(addedAt);
     map['default_duration_minutes'] = Variable<int>(defaultDurationMinutes);
@@ -197,6 +224,9 @@ class MonitoredAppData extends DataClass
     return MonitoredAppsTableCompanion(
       packageName: Value(packageName),
       appName: Value(appName),
+      iconBytes: iconBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(iconBytes),
       isEnabled: Value(isEnabled),
       addedAt: Value(addedAt),
       defaultDurationMinutes: Value(defaultDurationMinutes),
@@ -211,6 +241,7 @@ class MonitoredAppData extends DataClass
     return MonitoredAppData(
       packageName: serializer.fromJson<String>(json['packageName']),
       appName: serializer.fromJson<String>(json['appName']),
+      iconBytes: serializer.fromJson<Uint8List?>(json['iconBytes']),
       isEnabled: serializer.fromJson<bool>(json['isEnabled']),
       addedAt: serializer.fromJson<DateTime>(json['addedAt']),
       defaultDurationMinutes: serializer.fromJson<int>(
@@ -224,6 +255,7 @@ class MonitoredAppData extends DataClass
     return <String, dynamic>{
       'packageName': serializer.toJson<String>(packageName),
       'appName': serializer.toJson<String>(appName),
+      'iconBytes': serializer.toJson<Uint8List?>(iconBytes),
       'isEnabled': serializer.toJson<bool>(isEnabled),
       'addedAt': serializer.toJson<DateTime>(addedAt),
       'defaultDurationMinutes': serializer.toJson<int>(defaultDurationMinutes),
@@ -233,12 +265,14 @@ class MonitoredAppData extends DataClass
   MonitoredAppData copyWith({
     String? packageName,
     String? appName,
+    Value<Uint8List?> iconBytes = const Value.absent(),
     bool? isEnabled,
     DateTime? addedAt,
     int? defaultDurationMinutes,
   }) => MonitoredAppData(
     packageName: packageName ?? this.packageName,
     appName: appName ?? this.appName,
+    iconBytes: iconBytes.present ? iconBytes.value : this.iconBytes,
     isEnabled: isEnabled ?? this.isEnabled,
     addedAt: addedAt ?? this.addedAt,
     defaultDurationMinutes:
@@ -250,6 +284,7 @@ class MonitoredAppData extends DataClass
           ? data.packageName.value
           : this.packageName,
       appName: data.appName.present ? data.appName.value : this.appName,
+      iconBytes: data.iconBytes.present ? data.iconBytes.value : this.iconBytes,
       isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
       addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
       defaultDurationMinutes: data.defaultDurationMinutes.present
@@ -263,6 +298,7 @@ class MonitoredAppData extends DataClass
     return (StringBuffer('MonitoredAppData(')
           ..write('packageName: $packageName, ')
           ..write('appName: $appName, ')
+          ..write('iconBytes: $iconBytes, ')
           ..write('isEnabled: $isEnabled, ')
           ..write('addedAt: $addedAt, ')
           ..write('defaultDurationMinutes: $defaultDurationMinutes')
@@ -274,6 +310,7 @@ class MonitoredAppData extends DataClass
   int get hashCode => Object.hash(
     packageName,
     appName,
+    $driftBlobEquality.hash(iconBytes),
     isEnabled,
     addedAt,
     defaultDurationMinutes,
@@ -284,6 +321,7 @@ class MonitoredAppData extends DataClass
       (other is MonitoredAppData &&
           other.packageName == this.packageName &&
           other.appName == this.appName &&
+          $driftBlobEquality.equals(other.iconBytes, this.iconBytes) &&
           other.isEnabled == this.isEnabled &&
           other.addedAt == this.addedAt &&
           other.defaultDurationMinutes == this.defaultDurationMinutes);
@@ -292,6 +330,7 @@ class MonitoredAppData extends DataClass
 class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
   final Value<String> packageName;
   final Value<String> appName;
+  final Value<Uint8List?> iconBytes;
   final Value<bool> isEnabled;
   final Value<DateTime> addedAt;
   final Value<int> defaultDurationMinutes;
@@ -299,6 +338,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
   const MonitoredAppsTableCompanion({
     this.packageName = const Value.absent(),
     this.appName = const Value.absent(),
+    this.iconBytes = const Value.absent(),
     this.isEnabled = const Value.absent(),
     this.addedAt = const Value.absent(),
     this.defaultDurationMinutes = const Value.absent(),
@@ -307,6 +347,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
   MonitoredAppsTableCompanion.insert({
     required String packageName,
     required String appName,
+    this.iconBytes = const Value.absent(),
     this.isEnabled = const Value.absent(),
     required DateTime addedAt,
     this.defaultDurationMinutes = const Value.absent(),
@@ -317,6 +358,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
   static Insertable<MonitoredAppData> custom({
     Expression<String>? packageName,
     Expression<String>? appName,
+    Expression<Uint8List>? iconBytes,
     Expression<bool>? isEnabled,
     Expression<DateTime>? addedAt,
     Expression<int>? defaultDurationMinutes,
@@ -325,6 +367,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
     return RawValuesInsertable({
       if (packageName != null) 'package_name': packageName,
       if (appName != null) 'app_name': appName,
+      if (iconBytes != null) 'icon_bytes': iconBytes,
       if (isEnabled != null) 'is_enabled': isEnabled,
       if (addedAt != null) 'added_at': addedAt,
       if (defaultDurationMinutes != null)
@@ -336,6 +379,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
   MonitoredAppsTableCompanion copyWith({
     Value<String>? packageName,
     Value<String>? appName,
+    Value<Uint8List?>? iconBytes,
     Value<bool>? isEnabled,
     Value<DateTime>? addedAt,
     Value<int>? defaultDurationMinutes,
@@ -344,6 +388,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
     return MonitoredAppsTableCompanion(
       packageName: packageName ?? this.packageName,
       appName: appName ?? this.appName,
+      iconBytes: iconBytes ?? this.iconBytes,
       isEnabled: isEnabled ?? this.isEnabled,
       addedAt: addedAt ?? this.addedAt,
       defaultDurationMinutes:
@@ -360,6 +405,9 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
     }
     if (appName.present) {
       map['app_name'] = Variable<String>(appName.value);
+    }
+    if (iconBytes.present) {
+      map['icon_bytes'] = Variable<Uint8List>(iconBytes.value);
     }
     if (isEnabled.present) {
       map['is_enabled'] = Variable<bool>(isEnabled.value);
@@ -383,6 +431,7 @@ class MonitoredAppsTableCompanion extends UpdateCompanion<MonitoredAppData> {
     return (StringBuffer('MonitoredAppsTableCompanion(')
           ..write('packageName: $packageName, ')
           ..write('appName: $appName, ')
+          ..write('iconBytes: $iconBytes, ')
           ..write('isEnabled: $isEnabled, ')
           ..write('addedAt: $addedAt, ')
           ..write('defaultDurationMinutes: $defaultDurationMinutes, ')
@@ -1156,6 +1205,7 @@ typedef $$MonitoredAppsTableTableCreateCompanionBuilder =
     MonitoredAppsTableCompanion Function({
       required String packageName,
       required String appName,
+      Value<Uint8List?> iconBytes,
       Value<bool> isEnabled,
       required DateTime addedAt,
       Value<int> defaultDurationMinutes,
@@ -1165,6 +1215,7 @@ typedef $$MonitoredAppsTableTableUpdateCompanionBuilder =
     MonitoredAppsTableCompanion Function({
       Value<String> packageName,
       Value<String> appName,
+      Value<Uint8List?> iconBytes,
       Value<bool> isEnabled,
       Value<DateTime> addedAt,
       Value<int> defaultDurationMinutes,
@@ -1187,6 +1238,11 @@ class $$MonitoredAppsTableTableFilterComposer
 
   ColumnFilters<String> get appName => $composableBuilder(
     column: $table.appName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get iconBytes => $composableBuilder(
+    column: $table.iconBytes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1225,6 +1281,11 @@ class $$MonitoredAppsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<Uint8List> get iconBytes => $composableBuilder(
+    column: $table.iconBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isEnabled => $composableBuilder(
     column: $table.isEnabled,
     builder: (column) => ColumnOrderings(column),
@@ -1257,6 +1318,9 @@ class $$MonitoredAppsTableTableAnnotationComposer
 
   GeneratedColumn<String> get appName =>
       $composableBuilder(column: $table.appName, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get iconBytes =>
+      $composableBuilder(column: $table.iconBytes, builder: (column) => column);
 
   GeneratedColumn<bool> get isEnabled =>
       $composableBuilder(column: $table.isEnabled, builder: (column) => column);
@@ -1312,6 +1376,7 @@ class $$MonitoredAppsTableTableTableManager
               ({
                 Value<String> packageName = const Value.absent(),
                 Value<String> appName = const Value.absent(),
+                Value<Uint8List?> iconBytes = const Value.absent(),
                 Value<bool> isEnabled = const Value.absent(),
                 Value<DateTime> addedAt = const Value.absent(),
                 Value<int> defaultDurationMinutes = const Value.absent(),
@@ -1319,6 +1384,7 @@ class $$MonitoredAppsTableTableTableManager
               }) => MonitoredAppsTableCompanion(
                 packageName: packageName,
                 appName: appName,
+                iconBytes: iconBytes,
                 isEnabled: isEnabled,
                 addedAt: addedAt,
                 defaultDurationMinutes: defaultDurationMinutes,
@@ -1328,6 +1394,7 @@ class $$MonitoredAppsTableTableTableManager
               ({
                 required String packageName,
                 required String appName,
+                Value<Uint8List?> iconBytes = const Value.absent(),
                 Value<bool> isEnabled = const Value.absent(),
                 required DateTime addedAt,
                 Value<int> defaultDurationMinutes = const Value.absent(),
@@ -1335,6 +1402,7 @@ class $$MonitoredAppsTableTableTableManager
               }) => MonitoredAppsTableCompanion.insert(
                 packageName: packageName,
                 appName: appName,
+                iconBytes: iconBytes,
                 isEnabled: isEnabled,
                 addedAt: addedAt,
                 defaultDurationMinutes: defaultDurationMinutes,

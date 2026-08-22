@@ -32,6 +32,7 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
       MonitoredAppsTableCompanion(
         packageName: Value(app.packageName),
         appName: Value(app.appName),
+        iconBytes: Value(app.icon),
         isEnabled: const Value(true), // Always enabled upon addition
         addedAt: Value(app.addedAt),
         defaultDurationMinutes: Value(app.defaultDurationMinutes),
@@ -42,6 +43,7 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
 
   @override
   Future<void> removeMonitoredApp(String packageName) async {
+    _iconCache.remove(packageName);
     await _db.deleteMonitoredApp(packageName);
     await syncNativeList();
   }
@@ -92,10 +94,14 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
   }
 
   MonitoredApp _mapRowToEntity(MonitoredAppData row) {
+    final icon = row.iconBytes ?? _iconCache[row.packageName];
+    if (icon != null) {
+      _iconCache[row.packageName] = icon;
+    }
     return MonitoredApp(
       packageName: row.packageName,
       appName: row.appName,
-      icon: _iconCache[row.packageName],
+      icon: icon,
       isEnabled: row.isEnabled,
       addedAt: row.addedAt,
       defaultDurationMinutes: row.defaultDurationMinutes,

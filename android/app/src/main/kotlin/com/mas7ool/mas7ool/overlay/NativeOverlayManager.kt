@@ -435,7 +435,7 @@ object NativeOverlayManager {
 
             // Close App Button (Primary Action)
             val closeBtn = Button(appContext).apply {
-                text = "إغلاق التطبيق والعودة للرئيسية"
+                text = "إغلاق التطبيق"
                 setTextColor(Color.WHITE)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
                 typeface = Typeface.DEFAULT_BOLD
