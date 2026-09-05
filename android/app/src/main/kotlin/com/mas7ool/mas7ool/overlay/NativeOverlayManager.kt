@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
 import com.mas7ool.mas7ool.permissions.PermissionHelper
+import com.mas7ool.mas7ool.monitoring.ForegroundMonitoringService
 import org.json.JSONObject
 
 object NativeOverlayManager {
@@ -195,7 +196,7 @@ object NativeOverlayManager {
             for ((minutes, label) in durations) {
                 val btn = createOptionButton(appContext, label) {
                     Log.d(TAG, "Option clicked: $minutes mins for $packageName")
-                    saveActiveSessionSync(appContext, packageName, minutes)
+                    saveActiveSessionSync(appContext, packageName, appName, minutes)
                     closeOverlay(appContext)
                     listener?.onDurationSelected(packageName, minutes)
                 }
@@ -254,7 +255,7 @@ object NativeOverlayManager {
                     val mins = inputStr.toIntOrNull() ?: 5
                     val validMinutes = if (mins in 1..180) mins else 5
                     Log.d(TAG, "Custom duration clicked: $validMinutes mins for $packageName")
-                    saveActiveSessionSync(appContext, packageName, validMinutes)
+                    saveActiveSessionSync(appContext, packageName, appName, validMinutes)
                     closeOverlay(appContext)
                     listener?.onDurationSelected(packageName, validMinutes)
                 }
@@ -471,7 +472,7 @@ object NativeOverlayManager {
                 }
                 setOnClickListener {
                     Log.d(TAG, "Expired: Extend +1m clicked for $packageName")
-                    saveActiveSessionSync(appContext, packageName, 1)
+                    saveActiveSessionSync(appContext, packageName, appName, 1)
                     closeOverlay(appContext)
                     listener?.onExtendRequested(packageName, 1)
                 }
@@ -529,7 +530,7 @@ object NativeOverlayManager {
         }
     }
 
-    private fun saveActiveSessionSync(context: Context, packageName: String, minutes: Int) {
+    private fun saveActiveSessionSync(context: Context, packageName: String, appName: String, minutes: Int) {
         try {
             val prefs = context.getSharedPreferences("mas7ool_prefs", Context.MODE_PRIVATE)
             val currentJson = prefs.getString("active_sessions", "{}") ?: "{}"
@@ -537,6 +538,14 @@ object NativeOverlayManager {
             val expiresAt = System.currentTimeMillis() + (minutes * 60 * 1000L)
             json.put(packageName, expiresAt)
             prefs.edit().putString("active_sessions", json.toString()).apply()
+
+            val appNamesJson = prefs.getString("active_session_app_names", "{}") ?: "{}"
+            val namesObj = JSONObject(appNamesJson)
+            val finalAppName = if (appName.isNotBlank()) appName else packageName
+            namesObj.put(packageName, finalAppName)
+            prefs.edit().putString("active_session_app_names", namesObj.toString()).apply()
+
+            ForegroundMonitoringService.updateSessionNotification(context, packageName, finalAppName, expiresAt)
         } catch (e: Exception) {
             Log.e(TAG, "Error saving active session sync", e)
         }
@@ -549,6 +558,13 @@ object NativeOverlayManager {
             val json = JSONObject(currentJson)
             json.remove(packageName)
             prefs.edit().putString("active_sessions", json.toString()).apply()
+
+            val appNamesJson = prefs.getString("active_session_app_names", "{}") ?: "{}"
+            val namesObj = JSONObject(appNamesJson)
+            namesObj.remove(packageName)
+            prefs.edit().putString("active_session_app_names", namesObj.toString()).apply()
+
+            ForegroundMonitoringService.resetNotification(context)
         } catch (e: Exception) {
             Log.e(TAG, "Error removing active session sync", e)
         }

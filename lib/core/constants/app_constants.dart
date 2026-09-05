@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'مسؤول';
+  static const String appName = 'Mas7ool';
   static const String appSubtitle = 'التحكم الذكي في وقت استخدام التطبيقات';
 
   // Native Channels

@@ -39,13 +39,21 @@ class SessionEngine {
         await _sessionRepository.saveSession(_activeSession!);
         await _nativeBridge.removeActiveSession(_activeSession!.packageName);
       } else {
-        AppLogger.i('SESSION', 'Restoring active session for: ${latestSession.packageName}, remaining: ${latestSession.remainingTime.inSeconds}s');
-        _activeSession = latestSession;
-        _startTicker();
-        await _nativeBridge.syncActiveSession(
-          packageName: _activeSession!.packageName,
-          expiresAtMs: _activeSession!.expiresAt.millisecondsSinceEpoch,
-        );
+        final isNativeActive = await _nativeBridge.isSessionActiveInNative(latestSession.packageName);
+        if (!isNativeActive) {
+          AppLogger.i('SESSION', 'Session was ended natively while Flutter was inactive: ${latestSession.packageName}');
+          _activeSession = latestSession.copyWith(status: SessionStatus.ended);
+          await _sessionRepository.saveSession(_activeSession!);
+        } else {
+          AppLogger.i('SESSION', 'Restoring active session for: ${latestSession.packageName}, remaining: ${latestSession.remainingTime.inSeconds}s');
+          _activeSession = latestSession;
+          _startTicker();
+          await _nativeBridge.syncActiveSession(
+            packageName: _activeSession!.packageName,
+            appName: _activeSession!.appName,
+            expiresAtMs: _activeSession!.expiresAt.millisecondsSinceEpoch,
+          );
+        }
       }
     }
     _sessionStreamController.add(_activeSession);
@@ -79,6 +87,7 @@ class SessionEngine {
     await _sessionRepository.saveSession(session);
     await _nativeBridge.syncActiveSession(
       packageName: packageName,
+      appName: appName,
       expiresAtMs: expiresAt.millisecondsSinceEpoch,
     );
     await _nativeBridge.closeOverlay();
@@ -113,6 +122,7 @@ class SessionEngine {
     await _sessionRepository.saveSession(_activeSession!);
     await _nativeBridge.syncActiveSession(
       packageName: packageName,
+      appName: _activeSession!.appName,
       expiresAtMs: newExpiresAt.millisecondsSinceEpoch,
     );
     await _nativeBridge.closeOverlay();

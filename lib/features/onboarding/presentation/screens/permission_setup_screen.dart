@@ -88,7 +88,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                       ),
                       children: [
                         const Text(
-                          'يحتاج تطبيق مسؤول إلى بعض الصلاحيات الأساسية ليعمل بشكل صحيح وموثوق على نظام Android.',
+                          'يحتاج تطبيق Mas7ool إلى بعض الصلاحيات الأساسية ليعمل بشكل صحيح وموثوق على نظام Android.',
                           style: TextStyle(
                             fontSize: 14,
                             color: Color(0xFF94A3B8),
@@ -102,7 +102,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                           title: '1. الوصول لبيانات الاستخدام',
                           subtitle:
                               'نحتاج الوصول لإحصاءات استخدام التطبيقات لمعرفة متى يتم فتح التطبيقات التي اخترتها للمراقبة.',
-                          icon: Icons.data_usage_rounded,
+                          icon: Icons.data_usage,
                           isGranted: isUsageGranted,
                           isMandatory: true,
                           onTap: () =>
@@ -116,7 +116,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                           title: '2. الظهور فوق التطبيقات الأخرى',
                           subtitle:
                               'نحتاج إذن الظهور فوق التطبيقات الأخرى لعرض اختيار مدة الاستخدام وتنبيه انتهاء الوقت.',
-                          icon: Icons.layers_rounded,
+                          icon: Icons.layers,
                           isGranted: isOverlayGranted,
                           isMandatory: true,
                           onTap: () =>
@@ -130,7 +130,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                           title: '3. الإشعارات والتنبيهات',
                           subtitle:
                               'لعرض إشعار خدمة المراقبة الدائمة وتنبيهك عند انتهاء وقت الجلسة.',
-                          icon: Icons.notifications_active_rounded,
+                          icon: Icons.notifications_active,
                           isGranted: isNotificationGranted,
                           isMandatory: false,
                           onTap: () => _requestPermission(
@@ -145,7 +145,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
                           title: '4. استثناء توفير الطاقة',
                           subtitle:
                               'يمنع نظام Android من إيقاف خدمة المراقبة في الخلفية لضمان عملها بدقة.',
-                          icon: Icons.battery_charging_full_rounded,
+                          icon: Icons.battery_charging_full,
                           isGranted: isBatteryGranted,
                           isMandatory: false,
                           onTap: () => _requestPermission(
@@ -297,7 +297,7 @@ class _PermissionSetupScreenState extends ConsumerState<PermissionSetupScreen>
               ),
               if (isGranted)
                 const Icon(
-                  Icons.check_circle_rounded,
+                  Icons.check_circle,
                   color: Color(0xFF10B981),
                   size: 24,
                 ),

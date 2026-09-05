@@ -27,12 +27,20 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
 
   @override
   Future<void> addMonitoredApp(MonitoredApp app) async {
-    _iconCache[app.packageName] = app.icon;
+    Uint8List? icon = app.icon ?? _iconCache[app.packageName];
+    if (icon == null || icon.isEmpty) {
+      try {
+        icon = await _nativeBridge.getAppIcon(app.packageName);
+      } catch (_) {}
+    }
+    if (icon != null && icon.isNotEmpty) {
+      _iconCache[app.packageName] = icon;
+    }
     await _db.insertOrUpdateMonitoredApp(
       MonitoredAppsTableCompanion(
         packageName: Value(app.packageName),
         appName: Value(app.appName),
-        iconBytes: Value(app.icon),
+        iconBytes: Value(icon),
         isEnabled: const Value(true), // Always enabled upon addition
         addedAt: Value(app.addedAt),
         defaultDurationMinutes: Value(app.defaultDurationMinutes),
@@ -93,10 +101,24 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
     await _nativeBridge.syncMonitoredPackages(enabledPackages);
   }
 
+  @override
+  Future<void> syncMissingIcons() async {
+    try {
+      final apps = await _db.getAllMonitoredApps();
+      for (final app in apps) {
+        if (app.iconBytes == null || app.iconBytes!.isEmpty) {
+          await _loadAndCacheIcon(app.packageName);
+        }
+      }
+    } catch (_) {}
+  }
+
   MonitoredApp _mapRowToEntity(MonitoredAppData row) {
     final icon = row.iconBytes ?? _iconCache[row.packageName];
-    if (icon != null) {
+    if (icon != null && icon.isNotEmpty) {
       _iconCache[row.packageName] = icon;
+    } else {
+      _loadAndCacheIcon(row.packageName);
     }
     return MonitoredApp(
       packageName: row.packageName,
@@ -106,5 +128,17 @@ class MonitoredAppsRepositoryImpl implements MonitoredAppsRepository {
       addedAt: row.addedAt,
       defaultDurationMinutes: row.defaultDurationMinutes,
     );
+  }
+
+  Future<void> _loadAndCacheIcon(String packageName) async {
+    try {
+      final iconBytes = await _nativeBridge.getAppIcon(packageName);
+      if (iconBytes != null && iconBytes.isNotEmpty) {
+        _iconCache[packageName] = iconBytes;
+        await _db.updateAppIcon(packageName, iconBytes);
+      }
+    } catch (_) {
+      // Ignore background icon fetch errors
+    }
   }
 }

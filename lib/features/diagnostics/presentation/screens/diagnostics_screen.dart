@@ -51,7 +51,7 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
         title: const Text('شاشة الفحص والتشخيص'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh),
             tooltip: 'تحديث',
             onPressed: _refreshDiagnostics,
           ),

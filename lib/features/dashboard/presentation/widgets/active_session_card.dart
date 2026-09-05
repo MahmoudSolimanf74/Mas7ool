@@ -25,7 +25,7 @@ class ActiveSessionCard extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.hourglass_empty_rounded,
+                  Icons.hourglass_empty,
                   color: Color(0xFF94A3B8),
                   size: 26,
                 ),
@@ -92,8 +92,8 @@ class ActiveSessionCard extends ConsumerWidget {
                     ),
                     child: Icon(
                       isExpired
-                          ? Icons.warning_amber_rounded
-                          : Icons.timer_rounded,
+                          ? Icons.warning_amber
+                          : Icons.timer,
                       color: isExpired
                           ? const Color(0xFFEF4444)
                           : const Color(0xFF38BDF8),
@@ -198,7 +198,7 @@ class ActiveSessionCard extends ConsumerWidget {
                     activeSession.packageName,
                     additionalMinutes: 1,
                   ),
-                  icon: const Icon(Icons.add_rounded, size: 18),
+                  icon: const Icon(Icons.add, size: 18),
                   label: const Text(
                     '+1 دقيقة',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -221,7 +221,7 @@ class ActiveSessionCard extends ConsumerWidget {
                     activeSession.packageName,
                     sendHome: true,
                   ),
-                  icon: const Icon(Icons.close_rounded, size: 18),
+                  icon: const Icon(Icons.close, size: 18),
                   label: const Text(
                     'إنهاء وإغلاق',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),

@@ -10,7 +10,11 @@ void main() async {
   AppLogger.i('BOOTSTRAP', 'Starting Mas7ool Application...');
 
   // Initialize notifications
-  await NotificationService.initialize();
+  try {
+    await NotificationService.initialize();
+  } catch (e, st) {
+    AppLogger.e('BOOTSTRAP', 'NotificationService init error', e, st);
+  }
 
   runApp(
     const ProviderScope(

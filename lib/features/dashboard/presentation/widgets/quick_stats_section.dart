@@ -34,7 +34,7 @@ class QuickStatsSection extends ConsumerWidget {
             child: Column(
               children: [
                 const Icon(
-                  Icons.apps_rounded,
+                  Icons.apps,
                   color: Color(0xFF38BDF8),
                   size: 26,
                 ),
@@ -66,7 +66,7 @@ class QuickStatsSection extends ConsumerWidget {
             child: Column(
               children: [
                 const Icon(
-                  Icons.timelapse_rounded,
+                  Icons.timelapse,
                   color: Color(0xFF818CF8),
                   size: 26,
                 ),
@@ -98,7 +98,7 @@ class QuickStatsSection extends ConsumerWidget {
             child: Column(
               children: [
                 const Icon(
-                  Icons.access_time_filled_rounded,
+                  Icons.access_time,
                   color: Color(0xFF34D399),
                   size: 26,
                 ),

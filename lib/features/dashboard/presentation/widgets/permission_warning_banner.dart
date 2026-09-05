@@ -32,7 +32,7 @@ class PermissionWarningBanner extends ConsumerWidget {
         child: Row(
           children: [
             const Icon(
-              Icons.warning_rounded,
+              Icons.warning,
               color: Color(0xFFEF4444),
               size: 28,
             ),

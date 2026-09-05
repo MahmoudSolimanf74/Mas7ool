@@ -61,7 +61,7 @@ class _DeviceCompatibilityScreenState
                   child: Row(
                     children: [
                       const Icon(
-                        Icons.info_outline_rounded,
+                        Icons.info_outline,
                         color: Color(0xFF38BDF8),
                         size: 28,
                       ),
@@ -120,7 +120,7 @@ class _DeviceCompatibilityScreenState
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => bridge.openManufacturerAutostart(),
-                      icon: const Icon(Icons.power_settings_new_rounded, size: 16),
+                      icon: const Icon(Icons.power_settings_new, size: 16),
                       label: const Text('فتح إعدادات AutoStart'),
                     ),
                     const SizedBox(height: 8),
@@ -130,7 +130,7 @@ class _DeviceCompatibilityScreenState
                         side: const BorderSide(color: Color(0xFF38BDF8)),
                       ),
                       onPressed: () => bridge.openXiaomiBackgroundPopup(),
-                      icon: const Icon(Icons.layers_rounded, size: 16),
+                      icon: const Icon(Icons.layers, size: 16),
                       label: const Text('إذن النوافذ المنبثقة (Xiaomi)'),
                     ),
                   ],
@@ -144,7 +144,7 @@ class _DeviceCompatibilityScreenState
                   isCurrentOem: oemType == 'SAMSUNG',
                   instructions: [
                     '1. اذهب إلى: العناية بالجهاز > البطارية > حدود استخدام الخلفية.',
-                    '2. أضف مسؤول إلى قائمة "التطبيقات التي لا توضع في وضع السكون أبداً".',
+                    '2. أضف Mas7ool إلى قائمة "التطبيقات التي لا توضع في وضع السكون أبداً".',
                     '3. من معلومات التطبيق > البطارية، اختر "غير مقيّد (Unrestricted)".',
                   ],
                   actions: [
@@ -154,7 +154,7 @@ class _DeviceCompatibilityScreenState
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => bridge.openManufacturerAutostart(),
-                      icon: const Icon(Icons.battery_saver_rounded, size: 16),
+                      icon: const Icon(Icons.battery_saver, size: 16),
                       label: const Text('فتح إعدادات بطارية سامسونج'),
                     ),
                   ],
@@ -178,7 +178,7 @@ class _DeviceCompatibilityScreenState
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => bridge.openManufacturerAutostart(),
-                      icon: const Icon(Icons.launch_rounded, size: 16),
+                      icon: const Icon(Icons.launch, size: 16),
                       label: const Text('فتح إعدادات بدء التشغيل'),
                     ),
                   ],
@@ -191,7 +191,7 @@ class _DeviceCompatibilityScreenState
                   title: 'أجهزة Huawei & Honor (EMUI / HarmonyOS)',
                   isCurrentOem: oemType == 'HUAWEI',
                   instructions: [
-                    '1. في مدير الهاتف > تشغيل التطبيقات (App Launch)، ابحث عن مسؤول.',
+                    '1. في مدير الهاتف > تشغيل التطبيقات (App Launch)، ابحث عن Mas7ool.',
                     '2. غيّر الإعداد من تلقائي إلى "إدارة يدوية".',
                     '3. فعّل جميع الخيارات: بدء التشغيل التلقائي، وبدء التشغيل الثانوي، والتشغيل في الخلفية.',
                   ],
@@ -202,7 +202,7 @@ class _DeviceCompatibilityScreenState
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () => bridge.openManufacturerAutostart(),
-                      icon: const Icon(Icons.settings_suggest_rounded, size: 16),
+                      icon: const Icon(Icons.settings, size: 16),
                       label: const Text('فتح إدارة بدء التشغيل'),
                     ),
                   ],

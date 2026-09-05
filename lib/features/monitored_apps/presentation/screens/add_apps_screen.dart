@@ -70,10 +70,10 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
                   onChanged: (val) => setState(() => _searchQuery = val),
                   decoration: InputDecoration(
                     hintText: 'ابحث عن اسم التطبيق أو الحزمة...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded),
+                            icon: const Icon(Icons.clear),
                             onPressed: () => setState(() => _searchQuery = ''),
                           )
                         : null,
@@ -134,19 +134,30 @@ class _AddAppsScreenState extends ConsumerState<AddAppsScreen> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: app.icon != null
+                                  child: (app.icon != null && app.icon!.isNotEmpty)
                                       ? Image.memory(
                                           app.icon!,
                                           width: 42,
                                           height: 42,
                                           fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) =>
+                                              Container(
+                                            width: 42,
+                                            height: 42,
+                                            color: const Color(0xFF334155),
+                                            child: const Icon(
+                                              Icons.android,
+                                              color: Colors.white70,
+                                              size: 22,
+                                            ),
+                                          ),
                                         )
                                       : Container(
                                           width: 42,
                                           height: 42,
                                           color: const Color(0xFF334155),
                                           child: const Icon(
-                                            Icons.android_rounded,
+                                            Icons.android,
                                             color: Colors.white70,
                                             size: 22,
                                           ),

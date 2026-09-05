@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mas7ool/core/services/native_bridge_service.dart';
 import 'package:mas7ool/features/sessions/domain/entities/app_usage_session.dart';
@@ -47,11 +48,18 @@ class FakeNativeBridgeService extends NativeBridgeService {
   @override
   Future<void> syncActiveSession({
     required String packageName,
+    String appName = '',
     required int expiresAtMs,
   }) async {
     lastSyncedPackage = packageName;
     lastSyncedExpiresAt = expiresAtMs;
   }
+
+  @override
+  Future<bool> isSessionActiveInNative(String packageName) async => true;
+
+  @override
+  Future<Uint8List?> getAppIcon(String packageName) async => null;
 
   @override
   Future<void> removeActiveSession(String packageName) async {

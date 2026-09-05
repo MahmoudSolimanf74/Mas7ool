@@ -36,7 +36,7 @@ class MonitoredAppsScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        Icons.apps_rounded,
+                        Icons.apps,
                         size: 64,
                         color: Color(0xFF38BDF8),
                       ),
@@ -63,7 +63,7 @@ class MonitoredAppsScreen extends ConsumerWidget {
                     const SizedBox(height: 28),
                     ElevatedButton.icon(
                       onPressed: () => context.push('/monitored-apps/add'),
-                      icon: const Icon(Icons.add_rounded),
+                      icon: const Icon(Icons.add),
                       label: const Text('إضافة تطبيق الآن'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2563EB),
@@ -103,7 +103,7 @@ class MonitoredAppsScreen extends ConsumerWidget {
               onPressed: () => context.push('/monitored-apps/add'),
               backgroundColor: const Color(0xFF2563EB),
               foregroundColor: Colors.white,
-              icon: const Icon(Icons.add_rounded),
+              icon: const Icon(Icons.add),
               label: const Text('إضافة تطبيقات'),
             )
           : null,
@@ -122,19 +122,28 @@ class MonitoredAppsScreen extends ConsumerWidget {
           // App Icon
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: app.icon != null
+            child: (app.icon != null && app.icon!.isNotEmpty)
                 ? Image.memory(
                     app.icon!,
                     width: 46,
                     height: 46,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 46,
+                      height: 46,
+                      color: const Color(0xFF334155),
+                      child: const Icon(
+                        Icons.android,
+                        color: Colors.white70,
+                      ),
+                    ),
                   )
                 : Container(
                     width: 46,
                     height: 46,
                     color: const Color(0xFF334155),
                     child: const Icon(
-                      Icons.android_rounded,
+                      Icons.android,
                       color: Colors.white70,
                     ),
                   ),
@@ -179,7 +188,7 @@ class MonitoredAppsScreen extends ConsumerWidget {
 
           // Delete button
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+            icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
             onPressed: () => _confirmDelete(context, app, repo),
           ),
         ],

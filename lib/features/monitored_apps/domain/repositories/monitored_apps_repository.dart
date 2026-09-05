@@ -8,4 +8,5 @@ abstract class MonitoredAppsRepository {
   Future<void> toggleAppEnabled(String packageName, bool isEnabled);
   Future<List<MonitoredApp>> scanInstalledApps({bool includeSystem = false});
   Future<void> syncNativeList();
+  Future<void> syncMissingIcons();
 }

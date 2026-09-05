@@ -18,22 +18,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'title': 'تحكّم بوقتك بوعي',
       'description':
-          'مسؤول يساعدك على التوقف عن التمرير اللانهائي (Doomscrolling) في تطبيقات التواصل الاجتماعي وتحديد أهداف استخدام واضحة.',
-      'icon': Icons.timer_outlined,
+          'تطبيق Mas7ool يساعدك على التوقف عن التمرير اللانهائي (Doomscrolling) في تطبيقات التواصل الاجتماعي وتحديد أهداف استخدام واضحة.',
+      'icon': Icons.timer,
       'color': const Color(0xFF3B82F6),
     },
     {
       'title': 'نافذة تحديد المدة الفورية',
       'description':
           'بمجرد فتح أي تطبيق مُراقَب، تظهر لك نافذة تسألك كم دقيقة تريد استخدامه، لتبدأ جلسة استخدام محددة بدقة.',
-      'icon': Icons.layers_outlined,
+      'icon': Icons.layers,
       'color': const Color(0xFF8B5CF6),
     },
     {
       'title': 'تنبيه حازم وإغلاق آمن',
       'description':
-          'عند انتهاء الوقت، ينبهك مسؤول مباشرة، ويتيح لك إضافة دقيقة واحدة كحد أقصى أو الرجوع إلى الشاشة الرئيسية بسلام.',
-      'icon': Icons.shield_outlined,
+          'عند انتهاء الوقت، ينبهك Mas7ool مباشرة، ويتيح لك إضافة دقيقة واحدة كحد أقصى أو الرجوع إلى الشاشة الرئيسية بسلام.',
+      'icon': Icons.security,
       'color': const Color(0xFF10B981),
     },
   ];
@@ -143,7 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 label: _currentPage == _pages.length - 1
                     ? 'إعداد الصلاحيات والبدء'
                     : 'التالي',
-                icon: Icons.arrow_forward_rounded,
+                icon: Icons.arrow_forward,
                 onPressed: () {
                   if (_currentPage < _pages.length - 1) {
                     _pageController.nextPage(

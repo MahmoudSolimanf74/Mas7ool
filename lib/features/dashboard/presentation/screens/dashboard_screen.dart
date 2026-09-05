@@ -30,6 +30,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       final db = ref.read(databaseProvider);
       final savedState = await db.getSetting('monitoring_enabled');
 
+      // Sync monitored packages to native SharedPreferences
+      await ref.read(monitoredAppsRepositoryProvider).syncNativeList();
+      // Repair any missing app icons in database
+      await ref.read(monitoredAppsRepositoryProvider).syncMissingIcons();
+
       if (usageOk && overlayOk && (savedState == 'true' || savedState == null)) {
         await ref.read(monitoringStateMachineProvider).startMonitoring();
       }
@@ -86,7 +91,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: Column(
                   children: [
                     const Icon(
-                      Icons.add_to_home_screen_rounded,
+                      Icons.add_to_home_screen,
                       size: 40,
                       color: Color(0xFF38BDF8),
                     ),
@@ -128,19 +133,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: app.icon != null
+                            child: (app.icon != null && app.icon!.isNotEmpty)
                                 ? Image.memory(
                                     app.icon!,
                                     width: 38,
                                     height: 38,
                                     fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => Container(
+                                      width: 38,
+                                      height: 38,
+                                      color: const Color(0xFF334155),
+                                      child: const Icon(
+                                        Icons.android,
+                                        color: Colors.white70,
+                                        size: 20,
+                                      ),
+                                    ),
                                   )
                                 : Container(
                                     width: 38,
                                     height: 38,
                                     color: const Color(0xFF334155),
                                     child: const Icon(
-                                      Icons.android_rounded,
+                                      Icons.android,
                                       color: Colors.white70,
                                       size: 20,
                                     ),
@@ -173,8 +188,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           ),
                           Icon(
                             app.isEnabled
-                                ? Icons.check_circle_rounded
-                                : Icons.pause_circle_outline_rounded,
+                                ? Icons.check_circle
+                                : Icons.pause_circle_outline,
                             color: app.isEnabled
                                 ? const Color(0xFF10B981)
                                 : const Color(0xFF64748B),

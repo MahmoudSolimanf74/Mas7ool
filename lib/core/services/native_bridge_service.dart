@@ -173,15 +173,29 @@ class NativeBridgeService {
 
   Future<void> syncActiveSession({
     required String packageName,
+    String appName = '',
     required int expiresAtMs,
   }) async {
     try {
       await _methodChannel.invokeMethod('syncActiveSession', {
         'packageName': packageName,
+        'appName': appName,
         'expiresAt': expiresAtMs,
       });
     } catch (e) {
       AppLogger.w('NATIVE_BRIDGE', 'syncActiveSession failed: $e');
+    }
+  }
+
+  Future<bool> isSessionActiveInNative(String packageName) async {
+    try {
+      final result = await _methodChannel.invokeMethod<bool>(
+        'isSessionActiveInNative',
+        {'packageName': packageName},
+      );
+      return result ?? false;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -232,6 +246,18 @@ class NativeBridgeService {
     try {
       final result = await _methodChannel.invokeMethod<String>(
         'getCurrentForegroundPackage',
+      );
+      return result;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Uint8List?> getAppIcon(String packageName) async {
+    try {
+      final result = await _methodChannel.invokeMethod<Uint8List>(
+        'getAppIcon',
+        {'packageName': packageName},
       );
       return result;
     } catch (e) {

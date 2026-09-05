@@ -19,7 +19,7 @@ class SessionHistoryScreen extends ConsumerWidget {
         title: const Text('سجل الجلسات'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_sweep_outlined, color: Color(0xFFEF4444)),
+            icon: const Icon(Icons.delete_sweep, color: Color(0xFFEF4444)),
             tooltip: 'مسح السجل',
             onPressed: () => _confirmClearHistory(context, repo),
           ),
@@ -33,7 +33,7 @@ class SessionHistoryScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.history_toggle_off_rounded,
+                    Icons.history,
                     size: 64,
                     color: Color(0xFF64748B),
                   ),
@@ -116,7 +116,7 @@ class SessionHistoryScreen extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.access_time_rounded,
+              Icons.access_time,
               color: getStatusColor(),
               size: 22,
             ),

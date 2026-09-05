@@ -114,7 +114,7 @@ class MonitoringStateMachine {
 
     // Save enabled state to persistent database
     if (_db != null) {
-      await _db!.setSetting('monitoring_enabled', 'true');
+      await _db.setSetting('monitoring_enabled', 'true');
     }
 
     // Start native Foreground Service
@@ -142,7 +142,7 @@ class MonitoringStateMachine {
 
     // Save disabled state to persistent database
     if (_db != null) {
-      await _db!.setSetting('monitoring_enabled', 'false');
+      await _db.setSetting('monitoring_enabled', 'false');
     }
 
     await _nativeBridge.stopMonitoringService();
@@ -234,8 +234,10 @@ class MonitoringStateMachine {
         break;
 
       case 'closeApp':
+      case 'endSession':
+      case 'endSessionFromNotification':
         await _sessionEngine.endSession(packageName, sendHome: true);
-        _transitionTo(MonitoringState.watching, 'User closed monitored app');
+        _transitionTo(MonitoringState.watching, 'User ended session');
         break;
 
       case 'overlayDismissed':

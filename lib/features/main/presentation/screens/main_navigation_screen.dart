@@ -46,19 +46,19 @@ class MainNavigationScreen extends ConsumerWidget {
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
+              icon: Icon(Icons.dashboard),
               label: 'الرئيسية',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.apps_rounded),
+              icon: Icon(Icons.apps),
               label: 'التطبيقات',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history_rounded),
+              icon: Icon(Icons.history),
               label: 'السجل',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings_rounded),
+              icon: Icon(Icons.settings),
               label: 'الإعدادات',
             ),
           ],

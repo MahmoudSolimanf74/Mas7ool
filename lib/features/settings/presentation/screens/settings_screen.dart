@@ -36,7 +36,7 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => context.push('/settings/compatibility'),
             child: const Row(
               children: [
-                Icon(Icons.phone_android_rounded, color: Color(0xFF38BDF8)),
+                Icon(Icons.phone_android, color: Color(0xFF38BDF8)),
                 SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -58,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF64748B)),
+                Icon(Icons.chevron_left, size: 22, color: Color(0xFF64748B)),
               ],
             ),
           ),
@@ -80,7 +80,7 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => context.push('/permissions'),
             child: const Row(
               children: [
-                Icon(Icons.security_rounded, color: Color(0xFF10B981)),
+                Icon(Icons.security, color: Color(0xFF10B981)),
                 SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -102,7 +102,7 @@ class SettingsScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF64748B)),
+                Icon(Icons.chevron_left, size: 22, color: Color(0xFF64748B)),
               ],
             ),
           ),
@@ -126,7 +126,7 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.lock_outline_rounded, color: Color(0xFF10B981), size: 20),
+                    Icon(Icons.lock_outline, color: Color(0xFF10B981), size: 20),
                     SizedBox(width: 8),
                     Text(
                       'خصوصية محلية 100% (Local-First)',
@@ -157,7 +157,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   onPressed: () => _confirmResetAllData(context, db),
-                  icon: const Icon(Icons.delete_forever_rounded, size: 18),
+                  icon: const Icon(Icons.delete_forever, size: 18),
                   label: const Text('مسح جميع البيانات وإعادة الضبط'),
                 ),
               ],

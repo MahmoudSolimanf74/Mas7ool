@@ -29,17 +29,29 @@ import java.util.concurrent.Executors
 class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
 
     companion object {
+        private const val TAG = "MainActivity"
         const val METHOD_CHANNEL = "com.mas7ool/native_bridge"
         const val EVENT_CHANNEL = "com.mas7ool/monitoring_events"
 
         private var eventSink: EventChannel.EventSink? = null
         private val mainHandler = Handler(Looper.getMainLooper())
+        var isFlutterActive: Boolean = false
+            private set
 
-        fun isEventSinkAvailable(): Boolean = eventSink != null
+        fun isEventSinkAvailable(): Boolean = isFlutterActive && eventSink != null
 
         fun sendForegroundEvent(eventData: Map<String, Any>) {
+            if (!isEventSinkAvailable()) return
             mainHandler.post {
-                eventSink?.success(eventData)
+                try {
+                    if (isFlutterActive && eventSink != null) {
+                        eventSink?.success(eventData)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.w(TAG, "EventSink delivery failed: ${e.message}")
+                    isFlutterActive = false
+                    eventSink = null
+                }
             }
         }
     }
@@ -49,6 +61,7 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        isFlutterActive = true
 
         detector = ForegroundAppDetector(this)
         NativeOverlayManager.setListener(this)
@@ -58,10 +71,12 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
             object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                     eventSink = events
+                    isFlutterActive = true
                 }
 
                 override fun onCancel(arguments: Any?) {
                     eventSink = null
+                    isFlutterActive = false
                 }
             }
         )
@@ -157,13 +172,36 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
 
             "syncActiveSession" -> {
                 val packageName = call.argument<String>("packageName") ?: ""
-                val expiresAt = call.argument<Long>("expiresAt") ?: 0L
+                val appName = call.argument<String>("appName") ?: ""
+                val expiresAt = (call.argument<Number>("expiresAt"))?.toLong() ?: 0L
                 val prefs = getSharedPreferences("mas7ool_prefs", Context.MODE_PRIVATE)
                 val currentJson = prefs.getString("active_sessions", "{}") ?: "{}"
                 val json = JSONObject(currentJson)
                 json.put(packageName, expiresAt)
                 prefs.edit().putString("active_sessions", json.toString()).apply()
+
+                val appNamesJson = prefs.getString("active_session_app_names", "{}") ?: "{}"
+                val namesObj = JSONObject(appNamesJson)
+                val finalAppName = if (appName.isNotEmpty()) appName else detector.getAppName(packageName)
+                namesObj.put(packageName, finalAppName)
+                prefs.edit().putString("active_session_app_names", namesObj.toString()).apply()
+
+                ForegroundMonitoringService.updateSessionNotification(this, packageName, finalAppName, expiresAt)
                 result.success(true)
+            }
+
+            "isSessionActiveInNative" -> {
+                val packageName = call.argument<String>("packageName") ?: ""
+                val prefs = getSharedPreferences("mas7ool_prefs", Context.MODE_PRIVATE)
+                val currentJson = prefs.getString("active_sessions", "{}") ?: "{}"
+                val json = JSONObject(currentJson)
+                val isActive = if (json.has(packageName)) {
+                    val expiresAt = json.getLong(packageName)
+                    expiresAt > System.currentTimeMillis()
+                } else {
+                    false
+                }
+                result.success(isActive)
             }
 
             "removeActiveSession" -> {
@@ -173,6 +211,13 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
                 val json = JSONObject(currentJson)
                 json.remove(packageName)
                 prefs.edit().putString("active_sessions", json.toString()).apply()
+
+                val appNamesJson = prefs.getString("active_session_app_names", "{}") ?: "{}"
+                val namesObj = JSONObject(appNamesJson)
+                namesObj.remove(packageName)
+                prefs.edit().putString("active_session_app_names", namesObj.toString()).apply()
+
+                ForegroundMonitoringService.resetNotification(this)
                 result.success(true)
             }
 
@@ -193,7 +238,46 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
                 result.success(pkg)
             }
 
+            "getAppIcon" -> {
+                val packageName = call.argument<String>("packageName") ?: ""
+                bgExecutor.execute {
+                    val bytes = fetchAppIcon(packageName)
+                    runOnUiThread {
+                        result.success(bytes)
+                    }
+                }
+            }
+
             else -> result.notImplemented()
+        }
+    }
+
+    private fun fetchAppIcon(packageName: String): ByteArray? {
+        if (packageName.isBlank()) return null
+        return try {
+            val pm = packageManager
+            val drawable: Drawable = try {
+                val launchIntent = pm.getLaunchIntentForPackage(packageName)
+                if (launchIntent != null) {
+                    val resolveInfo = pm.resolveActivity(launchIntent, 0)
+                    resolveInfo?.loadIcon(pm) ?: pm.getApplicationIcon(packageName)
+                } else {
+                    pm.getApplicationIcon(packageName)
+                }
+            } catch (e: Exception) {
+                try {
+                    pm.getApplicationIcon(packageName)
+                } catch (e2: Exception) {
+                    pm.defaultActivityIcon
+                }
+            }
+            val bitmap = drawableToBitmap(drawable)
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+            stream.toByteArray()
+        } catch (e: Exception) {
+            android.util.Log.w(TAG, "Failed to fetch icon for $packageName: ${e.message}")
+            null
         }
     }
 
@@ -237,7 +321,7 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
                 val drawable = info.loadIcon(pm)
                 val bitmap = drawableToBitmap(drawable)
                 val stream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 85, stream)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
                 stream.toByteArray()
             } catch (e: Exception) {
                 null
@@ -258,11 +342,8 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        if (drawable is BitmapDrawable && drawable.bitmap != null) {
-            return drawable.bitmap
-        }
-        val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 72
-        val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 72
+        val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth.coerceIn(48, 144) else 96
+        val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight.coerceIn(48, 144) else 96
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
@@ -305,7 +386,15 @@ class MainActivity : FlutterActivity(), NativeOverlayManager.OverlayListener {
         sendForegroundEvent(data)
     }
 
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        isFlutterActive = false
+        eventSink = null
+        super.cleanUpFlutterEngine(flutterEngine)
+    }
+
     override fun onDestroy() {
+        isFlutterActive = false
+        eventSink = null
         NativeOverlayManager.setListener(null)
         super.onDestroy()
     }

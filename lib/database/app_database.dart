@@ -81,6 +81,10 @@ class AppDatabase extends _$AppDatabase {
       (update(monitoredAppsTable)..where((t) => t.packageName.equals(packageName)))
           .write(MonitoredAppsTableCompanion(isEnabled: Value(isEnabled)));
 
+  Future<void> updateAppIcon(String packageName, Uint8List iconBytes) =>
+      (update(monitoredAppsTable)..where((t) => t.packageName.equals(packageName)))
+          .write(MonitoredAppsTableCompanion(iconBytes: Value(iconBytes)));
+
   // Sessions queries
   Future<List<AppUsageSessionData>> getAllSessions() =>
       (select(appUsageSessionsTable)

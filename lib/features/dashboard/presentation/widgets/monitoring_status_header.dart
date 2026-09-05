@@ -62,7 +62,7 @@ class MonitoringStatusHeader extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   isRunning
-                      ? 'يراقب مسؤول فتح التطبيقات المحددة تلقائياً'
+                      ? 'يراقب Mas7ool فتح التطبيقات المحددة تلقائياً'
                       : 'اضغط لتشغيل المراقبة والتحكم بالوقت',
                   style: const TextStyle(
                     fontSize: 12,
